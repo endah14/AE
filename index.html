@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender Cinta 2023</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            background-color: #fff0f5;
+            color: #6a4f4b;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 10px 0;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        button {
+            background-color: #ff6f91;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #ff4d6d;
+        }
+
+        .list-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .list-menu li {
+            margin: 10px 0;
+        }
+
+        .list-menu li button {
+            width: 200px;
+        }
+
+        .surat {
+            border: 2px solid #ff6f91;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #fff0f5;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        /* Page Headers */
+        .header {
+            background-color: #f2a7c8;
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+        }
+        .calendar-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            justify-content: center;
+            margin: 20px auto;
+            width: 90%;
+        }
+
+        .day {
+            padding: 10px;
+            background-color: #ff6f91;
+            color: white;
+            font-size: 14px;
+            border-radius: 5px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .day:hover {
+            background-color: #ff4d6d;
+        }
+
+        .day.special::after {
+            content: "❤️";
+            font-size: 14px;
+            color: red;
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #ff6f91; /* Bright pink for special days */
+        }
+
+        .day-header {
+            font-weight: bold;
+            background-color: #ffe8d6;
+            color: #6a4f4b;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .month-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-content: center;
+            margin: 20px auto;
+            width: 90%;
+        }
+
+        .month-box {
+            padding: 20px;
+            background-color: #fff0e1;
+            border-radius: 10px;
+            border: 2px solid #ff6f91;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .month-box:hover {
+            background-color: #ff6f91;
+            color: white;
+            transform: scale(1.1);
+        }
+        /* Styling for date details */
+        .details {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        #moment {
+            text-align: left;
+            margin-top: 10px; /* Opsional, jika ingin memberi jarak */
+            padding-left: 15px; /* Opsional, jika ingin memberi indentasi */
+            line-height: 1.6; /* Opsional, untuk memperbaiki jarak antar baris */
+        }
+
+        .details img {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .details p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 10px 0;
+            color: #5c4d5b;
+            text-align: left;
+        }
+
+        /* Navbar Style */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #ff6f91;
+            color: white;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .navbar .left {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .navbar .right {
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f2f8; /* Background for dropdown */
+            min-width: 160px;
+            z-index: 1;
+            right: 30px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 12px 16px;
+        }
+
+        .dropdown-content a {
+            padding: 12px 16px;
+            display: block;
+            text-decoration: none;
+            color: #6a4f4b;
+            background-color: #ff6f91;
+            border-radius: 5px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ff4d6d;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Space adjustment to avoid navbar overlap */
+        .main-content {
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+<!-- Navbar -->
+<div class="navbar">
+    <div class="left">Cerita Alayyuby dan Endah</div>
+    <div class="right dropdown">
+        &#x2022;&#x2022;&#x2022;
+        <div class="dropdown-content">
+            <a href="#" onclick="navigateToPage(3)">Perkenalan</a>
+            <a href="#" onclick="navigateToPage(4)">Kalender 2023</a>
+            <a href="#" onclick="navigateToPage(7)">Tentangmu</a>
+            <a href="#" onclick="navigateToPage(8)">Surat Cinta</a>
+            <a href="#" onclick="navigateToPage(9)">About</a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <!-- Halaman 1 -->
+    <div id="page1" class="page active">
+        <div class="header">
+            <h1>Selamat Datang, Sayang ❤️</h1>
+            <p>Semoga hari ini membawa kebahagiaan.</p>
+        </div>
+        <button onclick="navigateToPage(2)">Lanjut</button>
+    </div>
+
+    <!-- Halaman 2 -->
+    <div id="page2" class="page">
+        <h1>Menu Utama</h1>
+        <ul class="list-menu">
+            <li><button onclick="navigateToPage(3)">Perkenalan</button></li>
+            <li><button onclick="navigateToPage(4)">Kalender 2023</button></li>
+            <li><button onclick="navigateToPage(7)">Tentangmu</button></li>
+            <li><button onclick="navigateToPage(8)">Surat Cinta</button></li>
+        </ul>
+        <button onclick="navigateToPage(1)">Kembali</button>
+    </div>
+
+        <!-- Halaman 3 -->
+        <div id="page3" class="page">
+            <div class="surat">
+                <p>Perkenalkan, saya Endah.</p>
+            </div>
+            <button onclick="navigateToPage(2)">Kembali ke Menu</button>
+        </div>
+
+    <!-- Halaman 4 -->
+    <div id="page4" class="page">
+        <h1>Kalender 2023</h1>
+        <div class="month-grid">
+            <div class="month-box" onclick="goToMonth(1)">Januari</div>
+            <div class="month-box" onclick="goToMonth(2)">Februari</div>
+            <div class="month-box" onclick="goToMonth(3)">Maret</div>
+            <div class="month-box" onclick="goToMonth(4)">April</div>
+            <div class="month-box" onclick="goToMonth(5)">Mei</div>
+            <div class="month-box" onclick="goToMonth(6)">Juni</div>
+            <div class="month-box" onclick="goToMonth(7)">Juli</div>
+            <div class="month-box" onclick="goToMonth(8)">Agustus</div>
+            <div class="month-box" onclick="goToMonth(9)">September</div>
+            <div class="month-box" onclick="goToMonth(10)">Oktober</div>
+            <div class="month-box" onclick="goToMonth(11)">November</div>
+            <div class="month-box" onclick="goToMonth(12)">Desember</div>
+        </div>
+        <button onclick="navigateToPage(2)">Kembali ke Menu</button>
+    </div>
+
+     <!-- Halaman 5 -->
+     <div id="page5" class="page">
+        <h1><span id="monthName"></span></h1>
+        <div id="calendarDays" class="calendar-container"></div>
+        <button onclick="navigateToPage(4)">Kembali ke Kalender</button>
+    </div>
+
+    <div id="page6" class="page">
+        <h1>Detail Tanggal <span id="selectedDate"></span></h1>
+        <div class="details">
+            <img id="dayImage" src="" alt="Gambar Hari">
+            <p><strong>Cuaca:</strong> <span id="weather"></span></p>
+            <p><strong>Tempat:</strong> <span id="place"></span></p>
+            <p><strong>Kegiatan:</strong> <span id="activity"></span></p>
+            <p><strong>Jam:</strong> <span id="time"></span></p>
+            <p><strong>Moment Manis:</strong></p>
+            <div id="moment"></div> <!-- Tambahkan ini di sini -->
+        </div>
+        <button onclick="navigateToPage(5)">Kembali ke Kalender Bulan</button>
+    </div>    
+</div>
+
+        <!-- Halaman 7 -->
+        <div id="page7" class="page">
+            <div class="surat">
+                <p>Kamu baik.</p>
+                <p>Kamu tampan.</p>
+                <p>Terima kasih sudah hadir membawa cinta yang tulus.</p>
+            </div>
+            <button onclick="navigateToPage(2)">Kembali ke Menu</button>
+        </div>
+
+        <!-- Halaman 8 -->
+        <div id="page8" class="page">
+            <div class="surat">
+                <p>Isi surat cinta akan Anda isi sendiri nanti.</p>
+            </div>
+            <button onclick="navigateToPage(2)">Kembali ke Menu</button>
+        </div>
+
+        <!-- Halaman 9 -->
+        <div id="page9" class="page">
+            <h1>About</h1>
+            <p>Biodata Endah dan Alayyuby akan ditambahkan di sini.</p>
+            <button onclick="navigateToPage(2)">Kembali ke Menu</button>
+        </div>
+    </div>
+
+    <script>
+    const monthNames = [
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const daysInMonth = [
+        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+    ];
+
+    const loveDays = {
+        1: [14, 20, 24, 28, 31], // Januari
+        2: [6, 8, 15, 17, 22, 20, 25, 27], // Februari
+        3: [2, 5, 10, 13, 18, 22], // Maret
+        4: [5, 7, 8, 13, 17, 27, 29], // April
+        5: [2, 5, 9, 12, 13, 16, 18, 20, 22, 25, 26, 27], // Mei
+        6: [1, 3, 8, 9, 17, 24, 26], // Juni
+        7: [1, 6, 13, 18, 19, 26, 29], // Juli
+        8: [4, 15, 16, 22, 25], // Agustus
+        9: [1, 7, 10, 14, 16, 21, 22, 25, 29, 30], // September
+        10: [3, 8, 12, 13, 16, 17, 19, 25, 27], // Oktober
+        11: [3, 4, 6, 10, 11, 18, 23, 24, 28, 29], // November
+        12: [1, 2, 4, 5, 8, 11, 12, 14, 20, 21, 22, 29, 31], // Desember
+    };
+
+    const loveDaysDetails = {
+        1: {
+            14: {
+                weather: "Sore hari dengan gerimis ringan🌦️",
+                place: "Summarecon Mall Bekasi",
+                activity: "First Date",
+                time: "17:00 WIB",
+                moment: [
+                    "Aku menebak kendaraan kamu🚗, kamu parkir di depan Alfamidi sebrang (depan Popeye penitipan motor🛵)",
+                    "Rencana kita awalnya nonton🎥🎞️, karna aku telat datang, jadinya kita cancle😔🙏🏻",
+                    "Sesampainya di SMB kita makan di Fiesta🥩🍝",
+                    "First time date makananku tidak habis dan kamu menghabiskannya",
+                    "Aku cukup kaget karena kamu menggunakan garpuku untuk first time bertemu?😱 ",
+                    "Kamu menanyakan love language aku apa saat diperjalanan pulang, dan itu membuatku kefikiran love language aku apa😅",
+                    "The first time aku salim dengan pria🫴🏻(calon pasangan) yaitu kamu🫵🏻😊, ketika kamu mau salim balik🫳, aku yang kaget lalu aku tarik tangan aku maaf yah 😌",
+            ]
+            },
+            20: {
+                weather: "Sore hari berangin",
+                place: "Lobby gedung sebelah Family mart",
+                activity: "Menjemput aku pulang rapat DIKDAS",
+                time: "14:30 WIB",
+                moment: [
+                    "Kamu menjemput aku di Family Mart",
+                    "Kita makan soto",
+                    "Aku membantu memilihkan kamu parfum"
+            ]
+            },
+            24: {
+                weather: "Siang hari yang Cerah",
+                place: "Cafe di Galaxy Bekasi",
+                activity: "Menemani kamu zoom",
+                time: "11:00 WIB",
+                moment: [
+                    "Aku memberikan Chips (kertas berbentuk chips)",
+                    "Kita foto berdua untuk pertama kalinya",
+                    "kamu me moment abadikan saat membuka chips dengan timelapse",
+            ]
+            },
+            28: {
+                weather: "Malah hari berbintang cerah",
+                place: "Parkiran Hotel",
+                activity: "Menjemput aku rapat DIKDAS di Balkosa",
+                time: "18:00 WIB",
+                moment: [
+                "Kamu Khawatir aku pulang malam sendiri",
+                "Kamu menjemput aku di parkoran hotel didekat balkosa",
+                "Kita vc karna aku gatau dimana tempatnya, kamu nyamperin aku",
+                "Jujur aku kaget karna kamu parkir disana (karna gaada tempat parkir yang aman selain disana)",
+                "Kita makan (tapi aku lupa kita makan apa😔)" 
+            ]
+            },
+            31: {
+                weather: "Sore hari yang cerah",
+                place: "Pinggir Kali, Makan prasmanan",
+                activity: "Bermain mersama Ninis, Hidar, Atallah, Emir",
+                time: "15:00 WIB",
+                moment: [
+                "First Time ketemu teman-teman kamu🏻🧑🏻🧑🏻‍🦱🧕",
+                "Kamu masih dikampus jakarta, untuk mengejar waktu, aku dititipkan ke mobil Haidar",
+                "Kita jemput kamu, lalu kamu yang nyetir mobil Haidar",
+                "Saat kita duduk bersebelahan di cafe itu, first time kamu ndusel dan gigit lengan aku didepan teman-teman kamu🥰",
+                "Saat itu mood aku naik turun karna kamu dibercandain dan dibuka kartunya sama mereka hehe, but aku tetap percaya cerita dari kamu🥰",
+                "Kita foto bareng berdua full body disana, difotoin sama Ninis🫶🏻📸",
+                "Saat pulang dari pinggir Kali kamu mencium pipiku yang terhalangi krudung, kata kamu aku cium pipi kamu di krudung gapapa kan?😌",
+                "Setelah itu kamu ambil mobil kamu sedangkan aku dkk menuju ketempat makan Prasmanan🍚🥗🍗🥓",
+                "Jujur canggung karna blum ada kamu disana 🥹",
+                "Saat kamu hadir aku merasa lega, karna orang yang aku kenal sudah datang😊",
+                "Setelah makan kita berencana untuk ke cafe, tetapi aku gabisa karna waktu sudah malam, aku dan kamu pulang duluan pakai mobil kamu",                
+            ]
+            },
+        },
+        2: {
+            6: {
+                weather: "Sore hari yang cerah",
+                place: "Tempat makan Bakso di dekat Stasiun Bekasi",
+                activity: "Kamu menjemput aku di ST.Bekasi, saat itu aku sehabis rapat DIKDAS",
+                time: "16:00 WIB",
+                moment: [
+                    "Kamu terburu-buru untuk jemput aku, first time aku melihat kamu hanya kaosan dan koloran",
+                    "Kamu bilang kamu lapar dan belum makan, lalu kita mencari tempat makan yang searah dengan arah pulang",
+                    "Kamu memfotoi aku diam-diam saat itu📷, tapi aku sadar, jadi aku menepis tangan kamu, karna malu 🙏🏻😌",
+                ]
+            },
+            8: {
+                weather: "Malam hari yang sejuk",
+                place: "Warlan dan cafe dekat Perbanas",
+                activity: "Bermain mersama Ninis, Hidar, Atallah",
+                time: "18:20 WIB",
+                moment: [
+                    "Kamu mengambil gambarku secara diam-diam pakai filter📷, dengan sigap aku menutup mukaku",
+                    "setelah dari warlan kita ke cafe jakarta, terletak di gang perumahan, setelah sampai tempatnya, aku baru sadar kalau barista di tempat itu kating aku, aku takut ada kating aku, ahahaha itu moment lucu, kita private dari orang-orang tetapi kita sepertis sadar memasuki kandang harimau🦁",
+                    "sesampainya di rooftop kita semua bercanda, tertawa😊",
+            ]
+            },
+            15: {
+                weather: "Sore hari yang cerah ",
+                place: "Parkiran ST. Bekasi Timmur",
+                activity: "Menemuiku setelah Rapat DIKDAS",
+                time: "17:00 WIB",
+                moment: "Mengobrol bersama diparkiran mobil🚗"
+            },
+            17: {
+                weather: "Sore hari yang cerah ",
+                place: "Parkiran ST. Bekasi Timmur",
+                activity: "Menemuiku setelah Rapat DIKDAS",
+                time: "18:20 WIB",
+                moment: [
+                    "Kamu menemuiku terlambat, sangat- sangat terlambat🥹😭",
+                    "aku membuang waktu ku, membenarkan kerudung ditoilet😔",
+                    "Aku membeli dimsum untuk kita makan bersama dimobil",
+                    "Aku diajak ngobrol dengan abang dimsum karena aku duduk di warungnya cukup lama, dan pembelinya yang duduk disana hanya aku sendirian",
+                    "Aku ditawari masnya untuk menghangatkan dimsumnya lagi, supaya hangat jika perlu",
+                    "Setelah kamu datang kita mengobrol bersama diparkiran mobil🚗"
+            ]
+            },
+            22: {
+                weather: "Sore hari yang cerah",
+                place: "Stasiun Manggarai",
+                activity: "Pulang bersama menggunakan KRL🚋",
+                time: "14.00",
+                moment: [
+                    "Aku sampai duluan di ST. Manggarai, menungguimu",
+                    "Setelah kita sudah bertemu di depan pintu masuk setelah Tap kartu, kita sama-sama saling menghampiri",
+                    "Hal lucu adalah, ketika aku menghampirimu ke arah kiri, diarah kanan ada Bambam 😅(teman TI Bekasiku), yang tadinya kita mau berdekatan, aku langsung bilang ada bambam, dan kita sama-sama memencar satu sama lain 😂🤣",
+                    "Aku disapa Bambam (baru pulang ndah? ko lu masi disini?) aku jawab iya mau ketemu gabby😭🙏🏻",
+                    "Kita mampir ke Lawson untuk membeli makanan",
+                    "Setelah itu kita pulang bersama🚋",
+                    "Kamu berfoto denganku, kita foto no face, hanya badan🤳🏻"
+                ]
+            },
+            20: {
+                weather: "Sore hari yang sejuk",
+                place: "MCD ST. Bekasi Timur",
+                activity: "Makan Burger bersama",
+                time: "17:00 WIB",
+                moment: [
+                    "Kamu menemuiku di MCD sebelah, ST. Bekasi sepulang aku Rapat DIKDAS",
+                    "Kamu datang duluan, lalu duduk didalam, saat aku ingin parkir aku menemukanmu duluan di dekat pintu samping MCD😊",
+                    "Setelah aku selesai parkir, ingin menuju kearahmu, kamu berinisiatif untuk mengumpat, tapi aku tetep melihatmu ahahaha😊",
+                    "",
+                ]
+            },
+            25: {
+                weather: "Malah hari yang sejuk",
+                place: "Jonkira ",
+                activity: "Double date dengan Ninis & Haidar, Makan Ramen🍜",
+                time: "19:00 WIB",
+                moment: [
+                "Kita makan Ramen bersama",
+                "Kita mengobrol bersama",
+                "Kamu mengambil gambarku diam-diam🫶🏻",
+            ]
+            },
+            27: {
+                weather: "Pgi hari yang Cerah",
+                place: "Perjalanan ke Kampus Jakarta🏫 dan Makan Sate Padang",
+                activity: "Kekampus bersama tiba-tiba",
+                time: "06:00 WIB",
+                moment: [
+                    "Saat itu aku sudah sampai di ST. Bekasi Timur, sudah menuju peron jalur 2, lalu kamu mengabariku untuk kekmapus Jakrta bersama-sama pakai mobil, aku memutuskan untuk neik lagi dan menungguimu",
+                    "Kita berangkat bersama kekampus, dijalan kamu membeli lemper yang menurut kamu itu lemper terenak dijalan",
+                    "kamu mengkhawatirkan jam kelas aku, karna aku saat itu masuk jam 07.30, aku bilang matakuliah itu dosennya cukup santai, dan biasanya mulai jam 08.00",
+                    "Kamu menunggu aku di depan mall jalan besar di depan perbanas, lalu kita pulang bersama lagi🚗",
+                    "Moment manis tambahannya adalah kamu memvideokan aku dari dalam mobil🚗📹, saat aku jalan menghampirimu, itu sangat amat membuatku salting🫶🏻, saat aku buka pintu lalu kamu mengarahkan hp kamu ke aku😍",
+                    "Setelah itu kita makan sate padang di sekitar jakarta, aku inisiatif untuk timelapse kita saat makan📹, lalu kita berfoto didepan jendela tangga📸, yang terpantul diri kita",
+                ]
+            },
+        },
+        3: {
+            2: {
+                weather: "Sore hari dengan gerimis ringan 🌦️",
+                place: "Parkiran Mobil ST.B ekasi Timur",
+                activity: "Menyatakan cinta ❤️",
+                time: "17:00 WIB",
+                moment: [
+                    " Saat itu kamu mengajakku untuk bertemu, tetapi aku membawa motor🛵 lalu aku titipkan dipopeye, sembari menunggu kamu ⏳ ",
+                    "Karena kamu tidak datang-datang, aku memutuskan untuk ke ST.Bekasi Timur jam 16.30 untuk mengecek kamu, apa kamu ada disana? karena kamu aku hubungi ceklis 1🥲",
+                    "Sesudah aku sampai di Parkiran ST.Bekasi Timur, ternyata mobil kamu tidak ada, aku menunggu disana 15 menit, setelah itu aku putuskan untuk pulang",
+                    "Selama diperjalanan yang aku cari hanya mobil kamu, siapa tahu kita papasan dijalan😔",
+                    "Aku meletakan hp ku 📱 didalam tas, sedangkan tas aku di jok motor, feeling aku kamu mengabari aku, aku berhenti sejenak di gang perumahan pinggir jalan, lalu aku membuka hpku",
+                    "Ada pesan 💬 dan telf 📞 dari kamu, aku angkat lalu katamu, kamu di ST.Bekasi Timur dan gaada kuota, akupun disuru putar arah menemuimu di ST.Bekasi Timur",
+                    "Sesampainya didepan mobilmu, setelah aku membuka pintu, jujur aja aku melihat bunga di kursi belakangmu💐",
+                    "Kamu meminta maaf dan kamu memasang hpku untuk dijadikan timelapse 📹,kamu menyuruhku menutup mata karena kamu ingin memberikan ku bunga💐serta box hadiah 🛍️ yang didalmnya ada box musik serta, foto kita yang kamu cetak, foto kita saat di Pinggir kali  📸🎞️, lalu ada 5 dengan coklat dengan variant rasa yang berbeda-beda 🍫, kamupun menyatakan cinta serta perasaanmu kepadaku saat itu, dan akupun menjawab *iya aku mau*😊 ",
+                    "Aku tidak akan pernah melupakan moment manis nan indah itu 🥹, aku sangat-sangat, kaget dengan hadiahnya, aku terharu, aku happy, aku sedih bahagia, semuanya perasaan itu menjadi satu",
+                    "setelah kita resmi pacaran, kamu ditelf Haidar, lalu kita ke Kopi Nako Blue Lagon☕",
+                    "Kamu langsung menceritakan bunga 💐 yang kamu belikan kepadaku, kamu titipkan di rumah Ninis🏠, kamu menjelaskan kenapa kamu telat, karena mengambil bunga 💐 dan terkena macet🚗🛵🚌🚙",
+                    "Setelah jadian kitapun masih merahasiakan identitas kita😅, kamu mengenalkanku ke Dilan, bahwa aku bukan kuliah di perbanas",
+                    "Kamu mengantarkanku pulang dengan membuntutiku dari belakangku🛵🚗, karena saat itu sudah malam dan kamu ingin memastikan aku sampai rumah dengan selamat😘🫶🏻"
+                ]
+            },
+            5: {
+                weather: "Pagi hari dengan hujan rintik-rintik🌧️",
+                place: "GBK",
+                activity: "Jogging 🏃🏻‍♀🏃🏻",
+                time: "07:00 WIB",
+                moment: [
+                    "Kita janjian pagi namun maaf banget aku kesiangan😅🙏🏻",
+                    "Kamu menjemputku di Depan Alfamidi, saat itu first time aku tanpa make up, tetapi moment yang gabisa aku lupakan, tatapan kamu🥰, yang seperti tidak kaget dengan muka ku tanpa make up😅",
+                    "Setelah mau sampai GBK, ternyata hujan deras 🌦️🌧️tetapi langit cerah☀️, itu hanya hujan sebentar, kita menunggu didalam mobil, dan aku menemanimu sarapan sedikit sembari menunggu hujan reda",
+                    "Setelah hujan reda, kita jogging🏃🏻‍♀🏃🏻, lebih tepatnya aku yang menemanimu jogging saat itu, karena aku sedang pms dan pinggulku terasa sakit😣", 
+                    "Aku senang bisa memvideokanmu sedang lari didepanku, aku senang duduknya aku untuk meredakan sakit pinggulku, bisa merekamu selama lari didepanku, dan merekamu saat menghampiriku setelah kamu berlari🏃🏻🥰",
+                    "Setelah itu kita kemobil untuk beristirahat, dan kita membuat timelapse sembari istirahat 📹",
+                    "Kita mampir ke rumah sakit pertamina🏥, kamu mengambil uang cash 💳💸, sedangkan aku ganti baju di toilet",
+                    "Setelah itu kita berjalan kaki, menyebrang untuk makan sate ayam dan kambing diseberang jalan dari RS Pertamina",
+                    "Kamu selfie dengan aku, lalu kamu membagikannya ke grup WA(persahabatan dengan Haidar DKK)",
+                ]
+            },
+            10: {
+                weather: "Malam hari",
+                place: "Depan Ruko Sehat MGT (sebelah kali gang aku)",
+                activity: "Mengambil paket",
+                time: "19:00 WIB",
+                moment: [
+                    "Saat itu ayah aku sakit dan dirawat di Rs. Permata🏥, kamu khawatir dan ingin menjenguknya, tetapi tidak jadi menjenguk karena belum diperbolehkan untuk dijenguk",
+                    "Kita bertemu untuk menanyakan kabar aku, dan kita menghabiskan waktu bersama dengan mengobrol, saat itu kamu ingin memelukku dengan sangat amat erat 🫂",
+                    "Hari sebelumnya, kamu memesan paket pakai aplikasi aku, dan pertemuan kita sekaligus memberi paket kamu yang sudah datang📦",
+            ]
+            },
+            13: {
+                weather: "Sore hari menjelang Malam",
+                place: "Blok M",
+                activity: "Makan",
+                time: "17:00 WIB",
+                moment: "Aku sedikit lupa disini😔🙏🏻, yang aku ingat kamu pulang Nobar lalu menjemput aku di Kamjak dan kita makan Tongseng di Blok M🥣"
+            },
+            18: {
+                weather: "Pagi hari yang cerah⛅",
+                place: "Masjid",
+                activity: "kajian",
+                time: "07:00 WIB",
+                moment: [                    
+                "The first Time aku kajian dengan pasangan saat itu, yaitu kamu🫵🏻😊",
+                "Aku memakai gamis berwarna pink, seharian itu kamu memuji aku xixixi🥰🫶🏻",
+                "Sesampainya di Kajian, kamu menggodaku dengan kalimat, kita seperti pasutri baru ya ay😅🥰",
+                "Kamu banyak memberiku ilmu baru, kamu menyuruhku wudhu dan sholat dhuha",
+                "Saat sesi pertanyaan yang dibacakan oleh ustadz, ada kalimat kurang lebih seperti ini yang aku ingat * saya sudah menemukan wanita yang tepat ustadz,setelah kalimat itu dibacakan oleh ustadz, sorak sorai didalam masjid terdengar jelas ay😊, akupun ikut salting mendengarnya, didalam hatiku masya Allah siapa wanita beruntung yang bisa diungkapkan melalui hati lewat ungkapan pembuka untuk pertanyaan seperti itu🥹*",
+                "Kelanjutan ustadz membacakan👳🏻‍♀️, tetapi bunda saya menginginkan saya mapan terlebih dahulu harus mempunyai rumah🏠, mobil 🚗 sendiri,baru menikah👰🏻‍♀️💍, bukan kah rezeki sudah diatur ustadz, apakah saya harus menuruti kemauan bunda saya dahulu lalu menikah atau bagaimana ya ustadz?",
+                "Setelah mendengar pertanyaan yang dibacakan oleh ustadz sampai habis, aku berfikir apakah orang yang membuat pertanyaannya itu kamu? dan tidak lama kamu mengabariku di WA, bahwa pertanyaan tersebut kamu yang menanyakannya😊",
+                "Setelah selesai acara, kita menuju kemobil, selama menuju kemobil, aku masih salting dengan ungkapan pertanyaan kamu 😌🤍",
+                "Kita mampir ke Susu Kedelai 🥛 yang ada di galaxy Bekasi",
+                "Kita berfoto didalam mobil dan kita berfoto diluar (kita memfoto pundak kita saja saat diluar),saat kita menunggu susu kedelainya siap, saat itu abangnya baru memasaknya jadi susunya belum siap",
+            ]
+            },
+            22: {
+                weather: "Siang hari berangin",
+                place: "Panti asuhan Galaxy Bekasi",
+                activity: "Memberi dan berbagi kebahagiaan bersama mereka",
+                time: "12:00 WIB",
+                moment: [
+                    "Kamu mewujudkan impianku, kepanti asuhan bersama pasangan🥹",
+                    "Moment yang tidak akan aku lupakan, saat itu kita telfonan dan aku memberi tahu cita-citaku, impianku bersama pasangan, setelah kamu tahu, kamu sangat amat excited untuk mewujudkan keinginanku itu🥹😭",
+                    "Saat itu akhir bulan, dan keuangan aku belum cukup untuk membeli keperluan panti, kamu bilang gapapa pakai uang kamu, aku tersentuh banget🥹, menjadi kamu yang excited, dan kamu meyakinkanku untuk ayu cepat-cepat kita kesana",
+                    "Akupun meminjam uang mama saat itu karna melihat kamu ingin sekali untuk kesana, walaupun kamu yang lebih banyak mengeluarkan biaya untuk membeli bahan pokok mereka",
+                    "Setelah sampai disana, aku bahagia, bahagia banget melihat mereka",
+                    "Disana kita disuruh membuat keinginan supaya didoakan oleh anak panti nantinya setelah mereka sholat🛐🤲🏻, kamu menuliskan di buku, tetapi aku gaboleh melihatnya🥹, tetapi aku sangat senang karena kamu nulisnya penuh memikirnya dahulu, yang artinya kamu bersungguh-sungguh untuk menuliskan doa-doa itu🥹",
+                    "Terimkasih sayang sudah mewujudkan salah satu cita-citaku, i love you so much💖💝",
+                ]
+            },
+        },
+        4: {
+            5: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            7: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            8: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            13: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            17: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            27: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            29: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+        },
+        5: {
+            2: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            5: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            9: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            12: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            13: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            16: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            18: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            20: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            22: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            25: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            26: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            27: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+        },
+        6: {
+            1: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            3: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            8: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            9: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            17: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            24: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            26: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+        },
+        7: {
+            1: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            6: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            13: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            18: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            19: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            26: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            29: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+        },
+        8: {
+            4: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            15: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            16: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            22: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            25: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+        },
+        9: {
+            1: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            7: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            10: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            14: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            16: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            21: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            22: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            25: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            29: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            30: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+        },
+        10: {
+            3: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            8: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            12: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            13: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            16: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            17: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            19: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            25: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            27: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+        },
+        11: {
+            3: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            4: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            6: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            10: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            11: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            18: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            23: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            24: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            28: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            29: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+        },
+        12: {
+            1: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            2: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            4: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            5: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            8: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            11: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+            },
+            12: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            14: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            21: {
+                weather: "Hujan romantis",
+                place: "Cafe favorit",
+                activity: "Ngopi berdua",
+                time: "19:00 WIB",
+                moment: "Mengobrol tentang mimpi bersama"
+            },
+            22: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            20: {
+                weather: "Cerah",
+                place: "Pantai",
+                activity: "Piknik",
+                time: "16:00 WIB",
+                moment: "Melihat matahari terbenam"
+            },
+            29: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+               },
+            31: {
+                weather: "Mendung",
+                place: "Bioskop",
+                activity: "Nonton film",
+                time: "14:00 WIB",
+                moment: "Pegangan tangan di bioskop ❤️"
+               },
+            }
+    }
+
+    let currentPage = 1;
+    let currentMonth = 1;
+
+    // Navigasi antar halaman
+    function navigateToPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const targetPage = document.getElementById(`page${page}`);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+    }
+
+    // Pergi ke bulan tertentu
+    function goToMonth(month) {
+        currentMonth = month;
+        document.getElementById("page4").classList.remove("active");
+        document.getElementById("page5").classList.add("active");
+
+        // Update nama bulan
+        document.getElementById("monthName").innerText = monthNames[month - 1];
+        generateCalendarDays(month);
+    }
+
+    // Generate kalender untuk bulan tertentu
+    const startingWeekdays = [0, 3, 3, 6, 1, 4, 6, 2, 5, 7, 3, 5]; // Start weekdays for each month
+
+function generateCalendarDays(month) {
+    const calendarDays = document.getElementById("calendarDays");
+    calendarDays.innerHTML = "";
+
+    const dayHeaders = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+    dayHeaders.forEach(header => {
+        const dayHeader = document.createElement("div");
+        dayHeader.classList.add("day-header");
+        dayHeader.innerText = header;
+        calendarDays.appendChild(dayHeader);
+    });
+
+    const firstDay = startingWeekdays[month - 1];  // Get the first day for the selected month
+
+    // Fill empty spaces for the starting weekday
+    for (let i = 0; i < firstDay; i++) {
+        const emptyDiv = document.createElement("div");
+        calendarDays.appendChild(emptyDiv);
+    }
+
+
+        // Tanggal
+        for (let day = 1; day <= daysInMonth[month - 1]; day++) {
+        const dayDiv = document.createElement("div");
+        dayDiv.classList.add("day");
+        // Memastikan tanggal ada di loveDays
+        if (loveDays[month] && loveDays[month].includes(day)) {
+            dayDiv.classList.add("special");  // Menandai hari spesial
+        }
+        dayDiv.innerText = day;
+        dayDiv.onclick = () => showDetails(day);  // Menambahkan event klik
+        calendarDays.appendChild(dayDiv);
+    }
+}
+
+function showDetails(day) {
+    document.getElementById("page5").classList.remove("active");
+    document.getElementById("page6").classList.add("active");
+    document.getElementById("selectedDate").innerText = `${day} ${monthNames[currentMonth - 1]}`;
+
+    const details = loveDaysDetails[currentMonth]?.[day];
+
+    if (details) {
+        document.getElementById("dayImage").src = "https://via.placeholder.com/100"; // Ganti dengan URL gambar
+        document.getElementById("weather").innerText = details.weather;
+        document.getElementById("place").innerText = details.place;
+        document.getElementById("activity").innerText = details.activity;
+        document.getElementById("time").innerText = details.time;
+
+        // Tampilkan moment sebagai daftar vertikal
+        const momentContainer = document.getElementById("moment");
+        momentContainer.innerHTML = ""; // Kosongkan kontainer sebelum mengisi
+        if (Array.isArray(details.moment)) {
+            const ul = document.createElement("ul");
+            details.moment.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+            momentContainer.appendChild(ul);
+        } else {
+            momentContainer.textContent = details.moment;
+        }
+    } else {
+        document.getElementById("weather").innerText = "Tidak ada";  
+        document.getElementById("place").innerText = "Tidak ada kegiatan khusus";
+        document.getElementById("activity").innerText = "Menunggu hari yang lebih baik!";
+        document.getElementById("time").innerText = "Tidak ada";
+        document.getElementById("moment").innerText = "Hari ini kita tidak bertemu sayang 😔";
+    }
+}
+</script>
